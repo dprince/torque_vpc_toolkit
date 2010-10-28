@@ -1,0 +1,13 @@
+[
+    {
+        "name": "test",
+        "script": "test.bash",
+        "resources": "nodes=boot1,walltime=00:01:00"
+    },
+    {
+        "name": "test2",
+        "script": "test2.bash",
+        "resources": "nodes=boot1",
+        "additional_attrs": "depend=afterok:$test"
+    }
+]

@@ -1,0 +1,28 @@
+#!/usr/bin/ruby
+
+require 'rubygems'
+require 'fileutils'
+
+CHEF_VPC_PROJECT = "#{File.dirname(__FILE__)}" unless defined?(CHEF_VPC_PROJECT)
+
+require 'torque-vpc-toolkit'
+include TorqueVPCToolkit
+
+# check to make sure this is a valid Chef VPC project dir
+if not File.exists?("config/chef_installer.yml") then
+	puts "Run this command within your Chef VPC project directory."
+	exit 1
+end
+
+if not File.exists?("tasks") then
+	FileUtils.mkdir("tasks")
+end
+FileUtils.cp(File.join(TorqueVPCToolkit::TORQUE_VPC_TOOLKIT_ROOT, 'contrib', 'rake', 'Rakefile'), File.join("tasks", "torque_vpc_toolkit.rake"))
+
+if not File.exists?("config/jobs.json") and not File.exists?(File.join('config', 'jobs.json.example')) then
+	FileUtils.cp(File.join(TorqueVPCToolkit::TORQUE_VPC_TOOLKIT_ROOT, 'contrib', 'conf', 'jobs.json.example'), 'config')
+end
+
+if not File.exists?("jobs") then
+	FileUtils.mkdir("jobs")
+end

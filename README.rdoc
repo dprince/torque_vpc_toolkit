@@ -1,0 +1,32 @@
+= Torque VPC Toolkit
+
+Rake tasks to submit jobs and interact with Torque via a web API.
+
+== Description
+
+The Torque VPC Toolkit is a set of Rake tasks that provide a way to interact
+with a Torque web API application. Intended to be used with the Chef VPC Toolkit and the Torque Job Control application.
+
+== Installation
+
+	gem install torque-vpc-toolkit
+
+Once you have the Torque toolkit gem install you can add tasks to job tasks
+to any Chef VPC by running the the following command inside of the Chef
+VPC project directory.
+
+	cd <my chef vpc project>
+	torque-vpc-toolkit
+
+== Tasks
+
+The following Rake tasks are provided by the toolkit:
+
+	rake job:create_and_run_all  # Create a new server group and run all jobs.
+	rake job:list                # List jobs
+	rake job:log                 # Print job logs for the specified JOB_ID.
+	rake job:node_states         # List node states
+	rake job:poll_controller     # Poll/loop until job controller is online
+	rake job:poll_jobs           # Poll/loop until jobs finish
+	rake job:submit              # Submit a job (requires: SCRIPT=<job_script_name>)
+	rake job:submit_all          # Submit all jobs (uses the jobs.json config file)

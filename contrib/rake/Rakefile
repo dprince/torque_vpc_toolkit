@@ -1,0 +1,16 @@
+require 'rubygems'
+
+jc_toolkit_version=nil
+if ENV['TORQUE_VPC_TOOLKIT_VERSION'] then
+    jc_toolkit_version=ENV['TORQUE_VPC_TOOLKIT_VERSION']
+end
+
+gem 'torque-vpc-toolkit', "= #{jc_toolkit_version}" if jc_toolkit_version
+
+require 'torque-vpc-toolkit'
+
+include TorqueVPCToolkit
+
+Dir[File.join(TorqueVPCToolkit::TORQUE_VPC_TOOLKIT_ROOT, 'rake', '*.rake')].each do  |rakefile|
+    import(rakefile)
+end
