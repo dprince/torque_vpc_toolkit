@@ -131,10 +131,11 @@ module TorqueVPCToolkit
 
 	end
 
-	def self.submit_all(configs, config_file=CHEF_VPC_ROOT + File::SEPARATOR + "config" + File::SEPARATOR + "jobs.json")
+	def self.submit_all(configs, base_config_file="jobs.json")
 
+                config_file=CHEF_VPC_ROOT + File::SEPARATOR + "config" + File::SEPARATOR + base_config_file
 		if not File.exists?(config_file) then
-			puts "The jobs.json config file is missing. No jobs scheduled."
+			puts "config file: " + config_file + " is missing. No jobs scheduled."
 			return
 		end
 
@@ -153,7 +154,7 @@ module TorqueVPCToolkit
 				xml=self.submit_job(configs, jobs_dir+script, name, resources, additional_attrs)
 				job_hash=TorqueVPCToolkit.jobs_list(xml)[0]
 				if jobid_vars.has_key?(name) then
-					raise "A unique job name must be specified in jobs.json"
+					raise "A unique job name must be specified in " + base_config_file
 				else
 					jobid_vars.store(name, job_hash["queue-job-id"])
 				end

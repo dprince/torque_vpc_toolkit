@@ -18,8 +18,12 @@ namespace :job do
 
 	end
 
-	desc "Submit all jobs (uses the jobs.json config file)"
+	desc "Submit all jobs (specify job config file with JOB_CONFIG, uses jobs.json by default)"
 	task :submit_all do
+		job_config=ENV['JOB_CONFIG']              
+                if job_config.nil? then
+                  job_config="jobs.json"
+                end
 
 		configs=CloudToolkit.load_configs
 		hash=CloudToolkit.hash_for_group(configs)
