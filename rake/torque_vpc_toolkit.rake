@@ -29,7 +29,7 @@ namespace :job do
 		hash=CloudToolkit.hash_for_group(configs)
 		configs["ssh_gateway_ip"]=hash["vpn-gateway"]
 		configs.merge!(ChefInstaller.job_control_credentials(hash['vpn-gateway']))
-		xml=JobControl.submit_all(configs)
+		xml=JobControl.submit_all(configs, job_config)
 
 	end
 
