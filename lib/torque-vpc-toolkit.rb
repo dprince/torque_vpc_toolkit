@@ -135,7 +135,7 @@ module TorqueVPCToolkit
 
                 config_file=CHEF_VPC_ROOT + File::SEPARATOR + "config" + File::SEPARATOR + base_config_file
 		if not File.exists?(config_file) then
-			puts "config file: " + config_file + " is missing. No jobs scheduled."
+                        puts "config file: #{base_config_file} is missing. No jobs scheduled."
 			return
 		end
 
