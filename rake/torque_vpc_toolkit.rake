@@ -7,40 +7,40 @@ namespace :job do
 		resources=ENV['RESOURCES']
 		additional_attrs=ENV['ATTRIBUTES']
 
-		configs=CloudToolkit.load_configs
-		hash=CloudToolkit.hash_for_group(configs)
+		configs=Util.load_configs
+		hash=Util.hash_for_group(configs)
 		configs["ssh_gateway_ip"]=hash["vpn-gateway"]
-		configs.merge!(ChefInstaller.job_control_credentials(hash['vpn-gateway']))
+		configs.merge!(TorqueVPCToolkit.job_control_credentials(hash['vpn-gateway']))
 
-		xml=JobControl.submit_job(configs, "jobs/#{script}", script, resources, additional_attrs)
-		job_hash=JobControl.jobs_list(xml)[0]
-		JobControl.print_job(job_hash)
+		xml=TorqueVPCToolkit.submit_job(configs, "jobs/#{script}", script, resources, additional_attrs)
+		job_hash=TorqueVPCToolkit.jobs_list(xml)[0]
+		TorqueVPCToolkit.print_job(job_hash)
 
 	end
 
 	desc "Submit all jobs (uses the jobs.json config file)"
 	task :submit_all do
 
-		configs=CloudToolkit.load_configs
-		hash=CloudToolkit.hash_for_group(configs)
+		configs=Util.load_configs
+		hash=Util.hash_for_group(configs)
 		configs["ssh_gateway_ip"]=hash["vpn-gateway"]
-		configs.merge!(ChefInstaller.job_control_credentials(hash['vpn-gateway']))
-		xml=JobControl.submit_all(configs)
+		configs.merge!(TorqueVPCToolkit.job_control_credentials(hash['vpn-gateway']))
+		xml=TorqueVPCToolkit.submit_all(configs)
 
 	end
 
 	desc "List jobs"
 	task :list do
 
-		configs=CloudToolkit.load_configs
-		hash=CloudToolkit.hash_for_group(configs)
-		configs.merge!(ChefInstaller.job_control_credentials(hash['vpn-gateway']))
+		configs=Util.load_configs
+		hash=Util.hash_for_group(configs)
+		configs.merge!(TorqueVPCToolkit.job_control_credentials(hash['vpn-gateway']))
 		xml=HttpUtil.get(
 			"https://"+hash["vpn-gateway"]+"/jobs.xml",
 			configs["torque_job_control_username"],
 			configs["torque_job_control_password"]
 		)
-		jobs=JobControl.jobs_list(xml)
+		jobs=TorqueVPCToolkit.jobs_list(xml)
 		puts "Jobs:"
 		jobs.each do |job|
 			puts "\t#{job['id']}: #{job['description']} (#{job['status']})"
@@ -51,15 +51,15 @@ namespace :job do
 	desc "List node states"
 	task :node_states do
 
-		configs=CloudToolkit.load_configs
-		hash=CloudToolkit.hash_for_group(configs)
-		configs.merge!(ChefInstaller.job_control_credentials(hash['vpn-gateway']))
+		configs=Util.load_configs
+		hash=Util.hash_for_group(configs)
+		configs.merge!(TorqueVPCToolkit.job_control_credentials(hash['vpn-gateway']))
 		xml=HttpUtil.get(
 			"https://"+hash["vpn-gateway"]+"/nodes",
 			configs["torque_job_control_username"],
 			configs["torque_job_control_password"]
 		)
-		node_states=JobControl.node_states(xml)
+		node_states=TorqueVPCToolkit.node_states(xml)
 		puts "Nodes:"
 		node_states.each_pair do |name, state|
 			puts "\t#{name}: #{state}"
@@ -74,13 +74,13 @@ namespace :job do
 			timeout=1200
 		end
 
-		configs=CloudToolkit.load_configs
-		hash=CloudToolkit.hash_for_group(configs)
-		configs.merge!(ChefInstaller.job_control_credentials(hash['vpn-gateway']))
+		configs=Util.load_configs
+		hash=Util.hash_for_group(configs)
+		configs.merge!(TorqueVPCToolkit.job_control_credentials(hash['vpn-gateway']))
 
 		puts "Polling for job controller to come online (this may take a couple minutes)..."
 		nodes=nil
-		JobControl.poll_until_online(hash["vpn-gateway"], timeout, configs) do |nodes_hash|
+		TorqueVPCToolkit.poll_until_online(hash["vpn-gateway"], timeout, configs) do |nodes_hash|
 			if nodes != nodes_hash then
 				nodes = nodes_hash
 				nodes_hash.each_pair do |name, state|
@@ -99,12 +99,12 @@ namespace :job do
 			timeout=3600
 		end
 
-		configs=CloudToolkit.load_configs
-		hash=CloudToolkit.hash_for_group(configs)
-		configs.merge!(ChefInstaller.job_control_credentials(hash['vpn-gateway']))
+		configs=Util.load_configs
+		hash=Util.hash_for_group(configs)
+		configs.merge!(TorqueVPCToolkit.job_control_credentials(hash['vpn-gateway']))
 
 		puts "Polling for jobs to finish running..."
-		JobControl.poll_until_jobs_finished(hash["vpn-gateway"], timeout, configs)
+		TorqueVPCToolkit.poll_until_jobs_finished(hash["vpn-gateway"], timeout, configs)
 		puts "Jobs finished."
 	end
 
@@ -112,10 +112,10 @@ namespace :job do
 	task :log do
 		job_id=ENV['JOB_ID']
 
-		configs=CloudToolkit.load_configs
-		hash=CloudToolkit.hash_for_group(configs)
-		configs.merge!(ChefInstaller.job_control_credentials(hash['vpn-gateway']))
-		job=JobControl.job_hash(hash["vpn-gateway"], job_id, configs)
+		configs=Util.load_configs
+		hash=Util.hash_for_group(configs)
+		configs.merge!(TorqueVPCToolkit.job_control_credentials(hash['vpn-gateway']))
+		job=TorqueVPCToolkit.job_hash(hash["vpn-gateway"], job_id, configs)
 
 		puts "--"
 		puts "Job ID: #{job['id']}"

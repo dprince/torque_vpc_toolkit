@@ -218,6 +218,22 @@ module TorqueVPCToolkit
 
 	end
 
+	# parse the torque_server role for job_control credentials
+	def self.job_control_credentials(ip_addr)
+		role_text=%x{ssh root@#{ip_addr} /usr/bin/knife role show torque_server}
+		json=JSON.parse(role_text.gsub(/\"json_class\"[^,]*,/, ''))
+		username=json["override_attributes"]["job_control"]["auth_username"]
+		password=json["override_attributes"]["job_control"]["auth_password"]
+		if block_given?
+			yield username, password
+		else
+			{
+			"job_control_username" => username,
+			"job_control_password"=> password
+			}
+		end
+	end
+
 	private
 	def self.replace_jobid_vars(str, vars)
 		return nil if str.nil?
@@ -228,5 +244,6 @@ module TorqueVPCToolkit
 		end
 		str
 	end
+
 
 end
