@@ -11,7 +11,6 @@ module TorqueVPCToolkit
 	include ChefVPCToolkit
 
 	def self.jobs_list(xml)
-
 		list=[]
 		dom = REXML::Document.new(xml)
 
@@ -166,6 +165,9 @@ module TorqueVPCToolkit
 
 	end
 
+        def self.submit_group(configs, group) 
+        end
+
 	def self.job_hash(vpn_gateway, job_id, configs=Util.load_configs)
 		if job_id.nil? or job_id.empty? then
 			raise "A valid job_id is required."
@@ -178,6 +180,16 @@ module TorqueVPCToolkit
 		TorqueVPCToolkit.jobs_list(xml)[0]
 
 	end
+
+        def self.get_jobs(configs, hash)
+              ip=hash['vpn-gateway']
+              xml=HttpUtil.get(
+                               "https://#{ip}/jobs.xml",
+                               configs["torque_job_control_username"],
+                               configs["torque_job_control_password"]
+                               )
+             return TorqueVPCToolkit.jobs_list(xml)
+        end
 
 	# default timeout of 20 minutes
 	def self.poll_until_jobs_finished(ip, timeout=1200, configs=Util.load_configs)
@@ -245,5 +257,14 @@ module TorqueVPCToolkit
 		str
 	end
 
+
+        def self.get_max_job_id(configs, hash)
+                jobs = TorqueVPCToolkit.get_jobs(configs, hash)
+
+                if jobs.empty?
+                  return 0
+                else
+                  return jobs.collect { |job| Integer(job['id']) }.sort.last
+        end
 
 end
