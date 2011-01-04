@@ -37,7 +37,8 @@ namespace :job do
 		hash=Util.hash_for_group(configs)
 		configs["ssh_gateway_ip"]=hash["vpn-gateway"]
 		configs.merge!(TorqueVPCToolkit.job_control_credentials(hash['vpn-gateway']))
-		xml=TorqueVPCToolkit.submit_group(configs, job_group)
+
+		xml=TorqueVPCToolkit.submit_all(configs, job_group)
         end
 
 	desc "List jobs"
