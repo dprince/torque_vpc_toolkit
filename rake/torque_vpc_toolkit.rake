@@ -140,7 +140,7 @@ namespace :job do
         end
 
         desc "Submit a job group and poll until it is complete (requires: JOB_GROUP=<file>)"
-        task :submit_and_poll_group do
+        task :submit_group_and_poll do
                 configs=Util.load_configs
 		hash=Util.hash_for_group(configs)
 
