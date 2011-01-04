@@ -130,7 +130,7 @@ module TorqueVPCToolkit
 
 	end
 
-	def self.submit_all(configs, config_file=CHEF_VPC_ROOT + File::SEPARATOR + "config" + File::SEPARATOR + "jobs.json")
+	def self.submit_all(configs, config_file=CHEF_VPC_PROJECT + File::SEPARATOR + "config" + File::SEPARATOR + "jobs.json")
 
 		if not File.exists?(config_file) then
 			puts "The jobs.json config file is missing. No jobs scheduled."
@@ -141,7 +141,7 @@ module TorqueVPCToolkit
 
 		# hash for job_name/job_id's (used for variable substitution)
 		jobid_vars={}
-		jobs_dir=CHEF_VPC_ROOT + File::SEPARATOR + "jobs" + File::SEPARATOR
+		jobs_dir=CHEF_VPC_PROJECT + File::SEPARATOR + "jobs" + File::SEPARATOR
 
 		json_hash.each do |job|
 			script=job["script"]
@@ -159,7 +159,7 @@ module TorqueVPCToolkit
 				puts "\tJob ID "+job_hash["id"]+ " submitted."
 				
 			else
-				raise "Job script '#{script}' does not exists."
+                               raise "Job script '#{script}' does not exist."
 			end
 		end
 
@@ -260,6 +260,7 @@ module TorqueVPCToolkit
                   return 0
                 else
                   return jobs.collect { |job| Integer(job['id']) }.sort.last
+                end
         end
 
 end
