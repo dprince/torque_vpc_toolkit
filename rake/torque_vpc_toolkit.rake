@@ -29,6 +29,17 @@ namespace :job do
 
 	end
 
+        desc "Submit job group (requires: JOB_GROUP=<file>)"
+        task :submit_group do
+		job_group=ENV['JOB_GROUP']
+
+		configs=Util.load_configs
+		hash=Util.hash_for_group(configs)
+		configs["ssh_gateway_ip"]=hash["vpn-gateway"]
+		configs.merge!(TorqueVPCToolkit.job_control_credentials(hash['vpn-gateway']))
+		xml=TorqueVPCToolkit.submit_group(configs, job_group)
+        end
+
 	desc "List jobs"
 	task :list do
 
@@ -107,6 +118,38 @@ namespace :job do
 		TorqueVPCToolkit.poll_until_jobs_finished(hash["vpn-gateway"], timeout, configs)
 		puts "Jobs finished."
 	end
+
+        desc "Poll/loop until a range of jobs finishes (requires: FROM_ID=<id>, TO_ID=<id>"
+        task :poll_jobs_range do
+                timeout=ENV['JOBS_TIMEOUT']
+		if timeout.nil? or timeout.empty? then
+			timeout=3600
+		end
+
+                from_id=ENV['FROM_ID']
+                to_id=ENV['TO_ID']
+	
+                configs=Util.load_configs
+		hash=Util.hash_for_group(configs)
+                puts "Polling for jobs #{from_id}-#{to_id} to finish running..."
+		TorqueVPCToolkit.poll_until_job_range_finished(hash["vpn-gateway"], timeout, configs, from_id, to_id)
+		puts "Jobs finished."
+
+        end
+
+        desc "Submit a job group and poll until it is complete (requires: JOB_GROUP=<file>)"
+        task :submit_and_poll_group do
+                configs=Util.load_configs
+		hash=Util.hash_for_group(configs)
+
+                initial_max = TorqueVPCToolkit.get_maximum_id(configs, hash)
+                Rake::Task['job:submit_group'].invoke
+                new_max = TorqueVPCToolkit.get_maximum_id(configs, hash)
+
+                ENV['FROM_ID'] = initial_max
+                ENV['TO_ID'] = new_max
+                Rake::Task['job:poll_jobs_range'].invoke                
+        end
 
 	desc "Print job logs for the specified JOB_ID."
 	task :log do
