@@ -165,9 +165,6 @@ module TorqueVPCToolkit
 
 	end
 
-        def self.submit_group(configs, group) 
-        end
-
 	def self.job_hash(vpn_gateway, job_id, configs=Util.load_configs)
 		if job_id.nil? or job_id.empty? then
 			raise "A valid job_id is required."
@@ -190,8 +187,18 @@ module TorqueVPCToolkit
              return TorqueVPCToolkit.jobs_list(xml)
         end
 
+        def self.poll_until_job_range_finished(ip, from_id, to_id, timeout=1200, configs=Util.load_configs)
+
+                def gen_filter(from_id, to_id)
+                  return Proc.new { |i| from_id <= i and i <= to_id }
+                end
+
+                criteria = gen_filter(from_id, to_id)
+                poll_until_jobs_finished(ip, timeout, configs, criteria)
+        end
+
 	# default timeout of 20 minutes
-	def self.poll_until_jobs_finished(ip, timeout=1200, configs=Util.load_configs)
+	def self.poll_until_jobs_finished(ip, timeout=1200, configs=Util.load_configs, criteria=nil)
 		count=0
 		until (count*20) >= timeout.to_i do
 			count+=1
@@ -205,6 +212,11 @@ module TorqueVPCToolkit
 
 			all_jobs_finished = true
 			jobs.each do |job|	
+                                id = Integer(job['id'])
+                                if criteria != nil and not criteria.call(id) then
+                                  next
+                                end
+
 				if job["status"] == "Failed" then
 					raise "Job ID #{job['id']} failed."
 				elsif job["status"] != "Completed" then
@@ -262,5 +274,4 @@ module TorqueVPCToolkit
                   return jobs.collect { |job| Integer(job['id']) }.sort.last
                 end
         end
-
 end
