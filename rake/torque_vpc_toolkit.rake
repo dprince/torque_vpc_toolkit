@@ -142,11 +142,11 @@ namespace :job do
                 configs=Util.load_configs
 		hash=Util.hash_for_group(configs)
 
-                initial_max = TorqueVPCToolkit.get_maximum_id(configs, hash)
+                initial_max = TorqueVPCToolkit.get_max_job_id(configs, hash)
                 Rake::Task['job:submit_group'].invoke
-                new_max = TorqueVPCToolkit.get_maximum_id(configs, hash)
+                new_max = TorqueVPCToolkit.get_max_job_id(configs, hash)
 
-                ENV['FROM_ID'] = initial_max
+                ENV['FROM_ID'] = initial_max + 1
                 ENV['TO_ID'] = new_max
                 Rake::Task['job:poll_jobs_range'].invoke                
         end
