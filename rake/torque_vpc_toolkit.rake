@@ -133,7 +133,8 @@ namespace :job do
                 configs=Util.load_configs
 		hash=Util.hash_for_group(configs)
                 puts "Polling for jobs #{from_id}-#{to_id} to finish running..."
-		TorqueVPCToolkit.poll_until_job_range_finished(hash["vpn-gateway"], timeout, configs, from_id, to_id)
+		TorqueVPCToolkit.poll_until_job_range_finished(hash["vpn-gateway"], Integer(from_id), Integer(to_id),
+                                                               timeout, configs)
 		puts "Jobs finished."
 
         end
@@ -147,8 +148,8 @@ namespace :job do
                 Rake::Task['job:submit_group'].invoke
                 new_max = TorqueVPCToolkit.get_max_job_id(configs, hash)
 
-                ENV['FROM_ID'] = initial_max + 1
-                ENV['TO_ID'] = new_max
+                ENV['FROM_ID'] = "#{initial_max + 1}"
+                ENV['TO_ID'] = "#{new_max}"
                 Rake::Task['job:poll_jobs_range'].invoke                
         end
 
