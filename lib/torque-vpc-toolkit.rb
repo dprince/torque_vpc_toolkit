@@ -181,8 +181,7 @@ module TorqueVPCToolkit
 
 	end
 
-        def self.get_jobs(configs, hash)
-              ip=hash['vpn-gateway']
+        def self.get_jobs(ip, configs)
               xml=HttpUtil.get(
                                "https://#{ip}/jobs.xml",
                                configs["torque_job_control_username"],
@@ -196,19 +195,14 @@ module TorqueVPCToolkit
 		count=0
 		until (count*20) >= timeout.to_i do
 			count+=1
-			xml=""
+			jobs = nil
 			begin
-				xml=HttpUtil.get(
-					"https://#{ip}/jobs.xml",
-					configs["torque_job_control_username"],
-					configs["torque_job_control_password"]
-				)
+				jobs=TorqueVPCToolkit.get_jobs(ip, configs)
 			rescue
 				sleep 20
 				next
 			end
 
-			jobs=TorqueVPCToolkit.jobs_list(xml)
 			all_jobs_finished = true
 			jobs.each do |job|	
 				if job["status"] == "Failed" then
@@ -259,7 +253,8 @@ module TorqueVPCToolkit
 
 
         def self.get_max_job_id(configs, hash)
-                jobs = TorqueVPCToolkit.get_jobs(configs, hash)
+                ip=hash['vpn-gateway']
+                jobs=TorqueVPCToolkit.get_jobs(ip, configs)
 
                 if jobs.empty?
                   return 0
