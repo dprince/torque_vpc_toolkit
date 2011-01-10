@@ -246,8 +246,8 @@ module TorqueVPCToolkit
 			yield username, password
 		else
 			{
-			"job_control_username" => username,
-			"job_control_password"=> password
+			"torque_job_control_username" => username,
+			"torque_job_control_password"=> password
 			}
 		end
 	end
