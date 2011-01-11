@@ -5,8 +5,8 @@ begin
   require 'jeweler'
   Jeweler::Tasks.new do |gem|
     gem.name = "torque-vpc-toolkit"
-    gem.summary = %Q{Blah}
-    gem.description = %Q{Blah}
+    gem.summary = %Q{Rake tasks to submit Torque jobs. }
+    gem.description = %Q{Rake tasks to submit, and poll Torque jobs.}
     gem.email = "dan.prince@rackspace.com"
     gem.homepage = "http://github.com/dprince/torque_vpc_toolkit"
     gem.authors = ["Dan Prince"]
