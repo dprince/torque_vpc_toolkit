@@ -173,27 +173,25 @@ namespace :job do
 
 	end
 
-	desc "Create a new server group and run all jobs."
-	task :create_and_run_all => ["create"] do
+end
 
-		Rake::Task['job:poll_controller'].invoke
-		Rake::Task['share:sync'].invoke
-		Rake::Task['job:submit_all'].invoke
-		Rake::Task['job:poll_jobs'].invoke
-		cleanup=ENV['CLEANUP']
+desc "Poll the controller, sync data, submit and poll all jobs."
+task :jobs do
 
-		if cleanup then
-			Rake::Task['cloud:delete'].invoke
-		end
+	Rake::Task['job:poll_controller'].invoke
+	Rake::Task['share:sync'].invoke
+	Rake::Task['job:submit_all'].invoke
+	Rake::Task['job:poll_jobs'].invoke
+	cleanup=ENV['CLEANUP']
 
+	if cleanup then
+		Rake::Task['group:delete'].invoke
 	end
 
 end
 
-desc "Create a server group, install chef, sync share data, run jobs."
+desc "DEPRECATED"
 task :all do
 
-	puts "DEPRECATED: The 'all' task is deprecated. Use 'job:create_and_run_all' instead."
-	Rake::Task['job:create_and_run_all'].invoke
-
+	puts "DEPRECATED: The 'all' task is deprecated. Use the 'rake create && rake jobs' tasks instead."
 end
